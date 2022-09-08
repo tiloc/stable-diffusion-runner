@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e
+bold=$(tput bold)
+normal=$(tput sgr0)
 
 mydir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -76,8 +78,19 @@ popd || exit
 
 unset -v latest
 for file in "$outdir"/*; do
-  [[ $file -nt $latest ]] && latest=$file
+  [[ $file -nt $latest ]] && latest=$(realpath "$file")
 done
 
-echo "Image saved to $latest"
+unset -v metafile
+metafile="$(dirname "$latest")/$(basename "$latest" png)txt"
+touch "$metafile"
+echo "$tf" >> "$metafile"
+echo >> "$metafile"
+
+echo "${bold}Proudly presenting${normal}"
+cat "$metafile"
+
+echo
+
+echo "${bold}Image saved to $latest${normal}"
 open "$latest"
